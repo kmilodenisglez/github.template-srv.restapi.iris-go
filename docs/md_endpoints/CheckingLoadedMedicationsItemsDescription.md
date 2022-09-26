@@ -1,0 +1,1 @@
+Checking loaded medication items for a given drone

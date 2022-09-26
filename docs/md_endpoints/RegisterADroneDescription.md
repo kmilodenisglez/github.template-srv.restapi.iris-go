@@ -1,0 +1,1 @@
+Register or update a drone in database
