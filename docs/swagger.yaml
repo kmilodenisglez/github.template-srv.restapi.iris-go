@@ -1,6 +1,7 @@
 basePath: /
 definitions:
   dto.Drone:
+    description: Drone item information
     properties:
       batteryCapacity:
         type: number
@@ -14,6 +15,7 @@ definitions:
         type: number
     type: object
   dto.Medication:
+    description: Medication item information
     properties:
       code:
         description: we assume that the code is unique
@@ -38,6 +40,9 @@ definitions:
         type: string
     type: object
   dto.RequestDrone:
+    description: drone model without the weightLimit, it is used for endpoint request
+      the weight limit is calculated from the drone's model (Lightweight, Middleweight,
+      Cruiserweight, Heavyweight)
     properties:
       batteryCapacity:
         type: number
@@ -61,9 +66,13 @@ definitions:
     properties:
       password:
         example: password1
+        maxLength: 20
+        minLength: 3
         type: string
       username:
         example: richard.sargon@meinermail.com
+        maxLength: 60
+        minLength: 3
         type: string
     required:
     - password
@@ -74,7 +83,7 @@ info:
     email: kmilo.denis.glez@gmail.com
     name: Daniel Mena and Kmilo Denis Glez
     url: https://github.com/dani-fmena and https://github.com/kmilodenisglez
-  description: REST API that allows clients to communicate with drones (i.e. **dispatch
+  description: REST API that allows clients to communicate with ... (i.e. **dispatch
     controller**)
   title: github template restapi
   version: "0.1"
@@ -84,9 +93,9 @@ paths:
       consumes:
       - multipart/form-data
       description: "Intent to grant authentication using the provider user's credentials
-        and the specified  auth provider\r\n\r\nUser Credentials:\r\n\r\n|  Username
-        \  | Password    | \r\n| ----------- | -----------|\r\n| richard.sargon@meinermail.com
-        | password1 |\r\n| tom.carter@meinermail.com | password2 |\r\n"
+        and the specified  auth provider\n\nUser Credentials:\n\n|  Username   | Password
+        \   | \n| ----------- | -----------|\n| richard.sargon@meinermail.com | password1
+        |\n| tom.carter@meinermail.com | password2 |\n"
       parameters:
       - description: User Login Credential
         in: body
@@ -180,33 +189,31 @@ paths:
     post:
       consumes:
       - application/json
-      description: "Populate the database with the following data:\r\n\r\n`two` users
-        for authentication:\r\n\r\n```json\r\n[\r\n  {\r\n    \"passphrase\": \"0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e\",\r\n
-        \   \"username\": \"richard.sargon@meinermail.com\",\r\n    \"name\": \"Richard
-        Sargon\"\r\n  },\r\n  {\r\n    \"passphrase\": \"6cf615d5bcaac778352a8f1f3360d23f02f34ec182e259897fd6ce485d7870d4\",\r\n
-        \   \"username\": \"tom.carter@meinermail.com\",\r\n    \"name\": \"Tom Carter\"\r\n
-        \ }\r\n]\r\n```\r\n\r\n```text\r\npassword for 'richard.sargon@meinermail.com'
-        user is: password1\r\npassword for 'tom.carter@meinermail.com' user is: password2\r\n```\r\n\r\n`ten`
-        drones:\r\n\r\n\r\nModel enum for a Drone:\r\n```text\r\n0 => Lightweight\r\n1
-        => Middleweight\r\n2 => Cruiserweight\r\n3 => Heavyweight\r\n\r\n```\r\n\r\nState
-        enum for a Drone:\r\n```text\r\n0 => IDLE\r\n1 => LOADING\r\n2 => LOADED\r\n3
-        => DELIVERING\r\n4 => DELIVERED\r\n5 => RETURNING\r\n```\r\n\r\ngenerated
-        drone collection:\r\n```json\r\n[\r\n  {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174001\",\"model\":2,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174002\",\"model\":1,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174003\",\"model\":3,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174004\",\"model\":1,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174005\",\"model\":3,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174006\",\"model\":0,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174007\",\"model\":2,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174008\",\"model\":3,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174009\",\"model\":0,...},\r\n
-        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174010\",\"model\":0,...}\r\n]\r\n```\r\n\r\nseven
-        (7) medications:\r\n```json\r\n[\r\n  {\"name\":\"a random string\",\"weight\":115,\"code\":\"a
-        random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"}, \r\n  {\"name\":\"a random
-        string\",\"weight\":10,\"code\":\"a random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"},\r\n
-        \ {\"name\":\"a random string\",\"weight\":210,\"code\":\"a random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"},\r\n
-        \ {\"name\":\"a random string\",\"weight\":34,\"code\":\"a random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"}\r\n
-        \ ...\r\n]\r\n```"
+      description: "Populate the database with the following data:\n\n`two` users
+        for authentication:\n\n```json\n[\n  {\n    \"passphrase\": \"0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e\",\n
+        \   \"username\": \"richard.sargon@meinermail.com\",\n    \"name\": \"Richard
+        Sargon\"\n  },\n  {\n    \"passphrase\": \"6cf615d5bcaac778352a8f1f3360d23f02f34ec182e259897fd6ce485d7870d4\",\n
+        \   \"username\": \"tom.carter@meinermail.com\",\n    \"name\": \"Tom Carter\"\n
+        \ }\n]\n```\n\n```text\npassword for 'richard.sargon@meinermail.com' user
+        is: password1\npassword for 'tom.carter@meinermail.com' user is: password2\n```\n\n`ten`
+        drones:\n\n\nModel enum for a Drone:\n```text\n0 => Lightweight\n1 => Middleweight\n2
+        => Cruiserweight\n3 => Heavyweight\n\n```\n\nState enum for a Drone:\n```text\n0
+        => IDLE\n1 => LOADING\n2 => LOADED\n3 => DELIVERING\n4 => DELIVERED\n5 =>
+        RETURNING\n```\n\ngenerated drone collection:\n```json\n[\n  {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174001\",\"model\":2,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174002\",\"model\":1,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174003\",\"model\":3,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174004\",\"model\":1,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174005\",\"model\":3,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174006\",\"model\":0,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174007\",\"model\":2,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174008\",\"model\":3,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174009\",\"model\":0,...},\n
+        \ {\"serialNumber\":\"123e4567-e89b-12d3-a456-426614174010\",\"model\":0,...}\n]\n```\n\nseven
+        (7) medications:\n```json\n[\n  {\"name\":\"a random string\",\"weight\":115,\"code\":\"a
+        random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"}, \n  {\"name\":\"a random string\",\"weight\":10,\"code\":\"a
+        random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"},\n  {\"name\":\"a random string\",\"weight\":210,\"code\":\"a
+        random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"},\n  {\"name\":\"a random string\",\"weight\":34,\"code\":\"a
+        random code\",\"image\":\"ZmFrZV9pbWFnZQ==\"}\n  ...\n]\n```"
       produces:
       - application/json
       responses:
@@ -235,11 +242,28 @@ paths:
     get:
       consumes:
       - application/json
-      description: "Get all drones or you can filter by status\r\n\r\n\r\nModel enum
-        for a Drone:\r\n```text\r\n0 => Lightweight\r\n1 => Middleweight\r\n2 => Cruiserweight\r\n3
-        => Heavyweight\r\n\r\n```\r\n\r\nState enum for a Drone:\r\n```text\r\n0 =>
-        IDLE\r\n1 => LOADING\r\n2 => LOADED\r\n3 => DELIVERING\r\n4 => DELIVERED\r\n5
-        => RETURNING\r\n```"
+      description: |-
+        Get all drones or you can filter by status
+
+
+        Model enum for a Drone:
+        ```text
+        0 => Lightweight
+        1 => Middleweight
+        2 => Cruiserweight
+        3 => Heavyweight
+
+        ```
+
+        State enum for a Drone:
+        ```text
+        0 => IDLE
+        1 => LOADING
+        2 => LOADED
+        3 => DELIVERING
+        4 => DELIVERED
+        5 => RETURNING
+        ```
       parameters:
       - default: Bearer <Add access token here>
         description: Insert access token
@@ -373,12 +397,28 @@ paths:
     get:
       consumes:
       - application/json
-      description: "Return the medication items\r\n\r\nTake the code medication item
-        as the unique identifier.\r\n\r\nExample Response body:\r\n````json\r\n[\r\n
-        \ {\r\n    \"name\": \"Hcj6VWVAzP1g\",\r\n    \"weight\": 700,\r\n    \"code\":
-        \"OJ02IBPL0U\",\r\n    \"image\": \"ZmFrZV9pbWFnZQ==\"\r\n  },\r\n  {\r\n
-        \   \"name\": \"CANCAPITAL\",\r\n    \"weight\": 490,\r\n    \"code\": \"60FJFAQ93H\",\r\n
-        \   \"image\": \"ZmFrZV9pbWFnZQ==\"\r\n  },...\r\n]\r\n````\r\n"
+      description: |
+        Return the medication items
+
+        Take the code medication item as the unique identifier.
+
+        Example Response body:
+        ````json
+        [
+          {
+            "name": "Hcj6VWVAzP1g",
+            "weight": 700,
+            "code": "OJ02IBPL0U",
+            "image": "ZmFrZV9pbWFnZQ=="
+          },
+          {
+            "name": "CANCAPITAL",
+            "weight": 490,
+            "code": "60FJFAQ93H",
+            "image": "ZmFrZV9pbWFnZQ=="
+          },...
+        ]
+        ````
       parameters:
       - default: Bearer <Add access token here>
         description: Insert access token

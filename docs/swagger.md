@@ -1,5 +1,12 @@
-## 📙 OpenAPI Specification
-To generate the OpenAPI specification run the fallowing command:
+# 📙 OpenAPI Specification
+
+## To install Swagger api documentation running this command:
+
+```shell
+go install github.com/swaggo/swag/cmd/swag@v1.8.6
+```
+
+## To generate the OpenAPI specification run the fallowing command:
 
 ```shell
 swag init --parseDependency --parseInternal --parseDepth 1 --md docs/md_endpoints
