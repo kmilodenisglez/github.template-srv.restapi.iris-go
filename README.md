@@ -80,6 +80,14 @@ Run:
 ```bash
 go mod download
 go mod vendor
+```
+
+If you make changes to the Endpoint you must generate Swagger API Spec:
+ 
+![swagger doc](/docs/swagger.md)
+
+Build:
+```bash
 go build
 ```
 
