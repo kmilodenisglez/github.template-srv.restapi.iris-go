@@ -7,7 +7,7 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.18.0
 	github.com/go-co-op/gocron v1.17.0
 	github.com/go-openapi/spec v0.20.3 // indirect
-	github.com/go-playground/validator/v10 v10.4.1
+	github.com/go-playground/validator/v10 v10.11.1
 	github.com/iris-contrib/swagger/v12 v12.2.0-alpha
 	github.com/json-iterator/go v1.1.12
 	github.com/kataras/iris/v12 v12.2.0-beta4.0.20220905135828-b037d11c1886
