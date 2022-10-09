@@ -32,7 +32,7 @@ func (s SvcResponse) ResWithDataStatus(status int, data interface{}, ctx *iris.C
 	// and client's requirements, instead of ctx.JSON:
 	// ctx.Negotiation().JSON().MsgPack().Protobuf()
 	// ctx.Negotiate(books)
-	if _, err := (*ctx).JSON(data); err != nil {																									// Logging *marshal* json if error occurs (come internally from iris)
+	if err := (*ctx).JSON(data); err != nil {																									// Logging *marshal* json if error occurs (come internally from iris)
 		(*ctx).Application().Logger().Error(err.Error())
 	}
 	(*ctx).StatusCode(status)
@@ -42,7 +42,7 @@ func (s SvcResponse) ResWithDataStatus(status int, data interface{}, ctx *iris.C
 // - data [interface] ~ "Object" to be marshalled in to the context.
 // - ctx [*iris.Context] ~ Iris Request context
 func (s SvcResponse) ResOKWithData(data interface{}, ctx *iris.Context) {
-	if _, err := (*ctx).JSON(data); err != nil {																									// Logging *marshal* json if error occurs (come internally from iris)
+	if err := (*ctx).JSON(data); err != nil {																									// Logging *marshal* json if error occurs (come internally from iris)
 		(*ctx).Application().Logger().Error(err.Error())
 	}
 	(*ctx).StatusCode(iris.StatusOK)
@@ -69,7 +69,7 @@ func (s SvcResponse) ResCreated(ctx *iris.Context)  {
 //
 // - ctx [*iris.Context] ~ Iris Request context
 func (s SvcResponse) ResCreatedWithData(data interface{}, ctx *iris.Context) {
-	if _, err := (*ctx).JSON(data); err != nil {																									// Logging *marshal* json if error occurs (come internally from iris)
+	if err := (*ctx).JSON(data); err != nil {																									// Logging *marshal* json if error occurs (come internally from iris)
 		(*ctx).Application().Logger().Error(err.Error())
 	}
 	(*ctx).StatusCode(iris.StatusCreated)
