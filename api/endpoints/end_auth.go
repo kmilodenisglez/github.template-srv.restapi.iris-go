@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/hero"
@@ -18,6 +19,7 @@ type HAuth struct {
 	response  *utils.SvcResponse
 	appConf   *utils.SvcConfig
 	providers map[string]bool
+	validate  *validator.Validate // handle validations for structs and individual fields based on tags
 }
 
 // NewAuthHandler create and register the authentication handlers for the App. For the moment, all the
@@ -30,8 +32,8 @@ type HAuth struct {
 // - svcR [*utils.SvcResponse] ~ GrantIntentResponse service instance
 //
 // - svcC [utils.SvcConfig] ~ Configuration service instance
-func NewAuthHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig) HAuth { // --- VARS SETUP ---
-	h := HAuth{svcR, svcC, make(map[string]bool)}
+func NewAuthHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig, validate *validator.Validate) HAuth { // --- VARS SETUP ---
+	h := HAuth{svcR, svcC, make(map[string]bool), validate}
 	// filling providers
 	h.providers["firstapp_provider"] = true
 

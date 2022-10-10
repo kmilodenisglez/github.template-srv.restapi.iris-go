@@ -21,10 +21,10 @@ func newApp() (*iris.Application, *utils.SvcConfig) {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	// region ======== GLOBALS ===============================================================
-	v := validator.New() // Validator instance. Reference https://github.com/kataras/iris/wiki/Model-validation | https://github.com/go-playground/validator
+	validate := validator.New() // Validator instance. Reference https://github.com/kataras/iris/wiki/Model-validation | https://github.com/go-playground/validator
 
-	app := iris.New() // App instance
-	app.Validator = v // Register validation on the iris app
+	app := iris.New()        // App instance
+	app.Validator = validate // Register validation on the iris app
 
 	// Services
 	svcConfig := utils.NewSvcConfig()              // Creating Configuration Service
@@ -54,8 +54,11 @@ func newApp() (*iris.Application, *utils.SvcConfig) {
 		ctx.Next()
 	}
 
-	// activate govalidator package and adding new validators
-	lib.InitValidator()
+	// activate validator/v10 package and adding new validators
+	err := lib.InitValidator(validate)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	// built-ins
 	app.Use(logger.New())
@@ -68,8 +71,8 @@ func newApp() (*iris.Application, *utils.SvcConfig) {
 
 	// region ======== ENDPOINT REGISTRATIONS ================================================
 
-	endpoints.NewAuthHandler(app, &mdwAuthChecker, svcResponse, svcConfig)
-	endpoints.NewFirstModuleHandler(app, &mdwAuthChecker, svcResponse, svcConfig)   // Drones request handlers
+	endpoints.NewAuthHandler(app, &mdwAuthChecker, svcResponse, svcConfig, validate)
+	endpoints.NewFirstModuleHandler(app, &mdwAuthChecker, svcResponse, svcConfig, validate) // Drones request handlers
 	// endregion =============================================================================
 
 	// region ======== SWAGGER REGISTRATION ==================================================
@@ -80,7 +83,7 @@ func newApp() (*iris.Application, *utils.SvcConfig) {
 	return app, svcConfig
 }
 
-// @title github template restapi
+// @title GitHub template restapi
 // @version 0.1
 // @description REST API that allows clients to communicate with ... (i.e. **dispatch controller**)
 
@@ -105,4 +108,3 @@ func main() {
 
 	app.Run(iris.Addr(addr))
 }
-

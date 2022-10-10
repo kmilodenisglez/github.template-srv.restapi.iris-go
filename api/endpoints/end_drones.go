@@ -2,8 +2,8 @@ package endpoints
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/hero"
@@ -19,6 +19,7 @@ import (
 type FirstModuleHandler struct {
 	response *utils.SvcResponse
 	service  *service.ISvcDrones
+	validate *validator.Validate // handle validations for structs and individual fields based on tags
 }
 
 // NewFirstModuleHandler create and register the handler for Drones
@@ -30,11 +31,11 @@ type FirstModuleHandler struct {
 // - svcR [*utils.SvcResponse] ~ GrantIntentResponse service instance
 //
 // - svcC [utils.SvcConfig] ~ Configuration service instance
-func NewFirstModuleHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig) FirstModuleHandler { // --- VARS SETUP ---
+func NewFirstModuleHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig, validate *validator.Validate) FirstModuleHandler { // --- VARS SETUP ---
 	repoDrones := db.NewRepoDrones(svcC)
 	svc := service.NewSvcDronesReqs(&repoDrones)
 	// registering protected / guarded router
-	h := FirstModuleHandler{svcR, &svc}
+	h := FirstModuleHandler{svcR, &svc, validate}
 
 	app.Get("/status", h.StatusServer)
 
@@ -194,21 +195,13 @@ func (h FirstModuleHandler) GetADrone(ctx iris.Context) {
 func (h FirstModuleHandler) RegisterADrone(ctx iris.Context) {
 	drone := new(dto.Drone)
 
-	// unmarshalling the JSON from request's body and check
+	// unmarshalling the JSON from request's body and validate fields
 	if err := ctx.ReadJSON(drone); err != nil {
-		h.response.ResErr(&dto.Problem{Status: iris.StatusBadRequest, Title: schema.ErrProcParam, Detail: err.Error()}, &ctx)
-		return
+		dto.HandleError(ctx, err, iris.StatusBadRequest)
 	}
 
 	// calculate drone weight limit
 	drone.WeightLimit = lib.CalculateDroneWeightLimit(drone.Model)
-
-	// validate drone fields
-	_, err := govalidator.ValidateStruct(drone)
-	if err != nil {
-		h.response.ResErr(&dto.Problem{Status: iris.StatusBadRequest, Title: schema.ErrValidationField, Detail: err.Error()}, &ctx)
-		return
-	}
 
 	problem := (*h.service).RegisterDroneSvc(drone)
 	if problem != nil {
@@ -265,7 +258,7 @@ func (h FirstModuleHandler) CheckingLoadedMedicationItems(ctx iris.Context) {
 		h.response.ResErr(&dto.Problem{Status: iris.StatusBadRequest, Title: schema.ErrProcParam, Detail: schema.ErrDetInvalidField}, &ctx)
 		return
 	}
-	isValid := lib.ValidateSerialNumberDrone(serialNumber)
+	isValid := lib.ValidateSerialNumberDrone(h.validate, serialNumber)
 	if !isValid {
 		h.response.ResErr(&dto.Problem{Status: iris.StatusInternalServerError, Title: schema.ErrValidationField, Detail: "the serial number of a drone must have a 100 characters max"}, &ctx)
 		return
@@ -278,7 +271,6 @@ func (h FirstModuleHandler) CheckingLoadedMedicationItems(ctx iris.Context) {
 	}
 	h.response.ResOKWithData(medicationsIDs, &ctx)
 }
-
 
 // LoadMedicationItems load a drone with medication items
 // @Summary Load a drone with medication items
@@ -303,7 +295,7 @@ func (h FirstModuleHandler) LoadMedicationItems(ctx iris.Context) {
 		h.response.ResErr(&dto.Problem{Status: iris.StatusBadRequest, Title: schema.ErrProcParam, Detail: schema.ErrDetInvalidField}, &ctx)
 		return
 	}
-	isValid := lib.ValidateSerialNumberDrone(serialNumber)
+	isValid := lib.ValidateSerialNumberDrone(h.validate, serialNumber)
 	if !isValid {
 		h.response.ResErr(&dto.Problem{Status: iris.StatusInternalServerError, Title: schema.ErrValidationField, Detail: "the serial number of a drone must have a 100 characters max"}, &ctx)
 		return

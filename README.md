@@ -1,7 +1,7 @@
 # 🛰 GitHub Template API server
 REST API that allows clients to communicate with * (i.e. **dispatch controller**).
 
-> **NOTE**: Drones app has been tested on **Ubuntu 18.04** and on **Windows 10 with WSL** and Golang 1.16 was used.
+> **NOTE**: Drones app has been tested on **Ubuntu 18.04** and on **Windows 10 with WSL** and Golang 1.18 was used.
 
 ## Table of Contents
 
@@ -128,6 +128,7 @@ go test -v
 
 ## 🔨 Tech and packages <a name="tech"></a>
 * [Iris Web Framework](https://github.com/kataras/iris)
+* [validator/v10](https://github.com/go-playground/validator)
 * [Buntdb](https://github.com/tidwall/buntdb)
 * [govalidator](https://github.com/asaskevich/govalidator)
 * [gocron](https://github.com/go-co-op/gocron)

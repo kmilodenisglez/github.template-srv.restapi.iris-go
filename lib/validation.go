@@ -2,10 +2,12 @@ package lib
 
 import (
 	"fmt"
-
 	"github.com/asaskevich/govalidator"
+	"github.com/go-playground/validator/v10"
 	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
+	"reflect"
 	reg "regexp"
+	"strings"
 )
 
 // ValidateString validate a string given a regular expression
@@ -16,35 +18,77 @@ func ValidateString(data string, regexp string) bool {
 // ValidateStringCollection validate a string collection given a regular expression
 func ValidateStringCollection(data []interface{}, regexp string) bool {
 	var fn govalidator.ConditionIterator = func(value interface{}, index int) bool {
-		fmt.Println(value.(string))
 		return reg.MustCompile(regexp).MatchString(value.(string))
 	}
 	return govalidator.ValidateArray(data, fn)
 }
 
-// InitValidator Activate behavior to require all fields and adding new validators
-func InitValidator() {
-	govalidator.SetFieldsRequiredByDefault(false)
+// ValidateStringCollectionUsingValidator10 validation into arrays type
+// e.g.
+// tag = "required,max=10,min=1,dive,max=12"
+//
+// 			max=10 		 -> Max array len
+// 			dive, max=12 -> Max length of every array element
+func ValidateStringCollectionUsingValidator10(validate *validator.Validate, data any, tag string) bool {
+	// variable must be a slice
+	if reflect.TypeOf(data).Kind() != reflect.Slice {
+		return false
+	}
 
+	errs := validate.Var(data, tag)
+	if errs != nil {
+		return false
+	}
+	if reflect.TypeOf(data).Elem().Kind() != reflect.String {
+		return false
+	}
+	return true
+}
+
+// InitValidator Activate behavior to require all fields and adding new validators
+func InitValidator(validate *validator.Validate) error {
 	// Add your own struct validation tags
 	// validates medication name
-	govalidator.TagMap["medication_name_validation"] = func(str string) bool {
-		return reg.MustCompile(dto.RegexpMedicationName).MatchString(str)
+	err := validate.RegisterValidation("medication_name_validation", func(fl validator.FieldLevel) bool {
+		fmt.Println("medication_name_validation: ", fl.Field().String(), reg.MustCompile(dto.RegexpMedicationCode).MatchString(fl.Field().String()))
+		return reg.MustCompile(dto.RegexpMedicationName).MatchString(fl.Field().String())
+	})
+	if err != nil {
+		return err
 	}
 
 	// validates medication code
-	govalidator.TagMap["medication_code_validation"] = func(str string) bool {
-		return reg.MustCompile(dto.RegexpMedicationCode).MatchString(str)
+	err = validate.RegisterValidation("medication_code_validation", func(fl validator.FieldLevel) bool {
+		fmt.Println("medication_code_validation: ", fl.Field().String(), reg.MustCompile(dto.RegexpMedicationCode).MatchString(fl.Field().String()))
+		return reg.MustCompile(dto.RegexpMedicationCode).MatchString(fl.Field().String())
+	})
+	if err != nil {
+		return err
 	}
 
 	// validates that an enum is within the interval
-	govalidator.TagMap["drone_enum_validation"] = func(str string) bool {
-		return str != "unknown"
+	err = validate.RegisterValidation("drone_enum_validation", func(fl validator.FieldLevel) bool {
+		value := fl.Field().Interface().(dto.DroneModel)
+		return value.String() != "unknown"
+	})
+	if err != nil {
+		return err
 	}
+
+	// validates that an enum is within the interval
+	err = validate.RegisterValidation("drone_state_validation", func(fl validator.FieldLevel) bool {
+		value := fl.Field().Interface().(dto.DroneState)
+		return value.String() != "unknown"
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func ValidateSerialNumberDrone(serialNumber string) bool {
-	return govalidator.MaxStringLength(serialNumber, dto.MaxSerialNumberLength)
+func ValidateSerialNumberDrone(validate *validator.Validate, serialNumber string) bool {
+	return validate.Var(serialNumber, fmt.Sprintf("required,max=%s", dto.MaxSerialNumberLength)) == nil
 }
 
 func CalculateDroneWeightLimit(model dto.DroneModel) float64 {
@@ -58,4 +102,22 @@ func CalculateDroneWeightLimit(model dto.DroneModel) float64 {
 	}
 
 	return dto.WeightLimitDrone
+}
+
+// NotBlank is the validation function for validating if the current field
+// has a value or length greater than zero, or is not a space only string.
+// example: v.RegisterValidation("notblank", NotBlank)
+func NotBlank(fl validator.FieldLevel) bool {
+	field := fl.Field()
+
+	switch field.Kind() {
+	case reflect.String:
+		return len(strings.TrimSpace(field.String())) > 0
+	case reflect.Chan, reflect.Map, reflect.Slice, reflect.Array:
+		return field.Len() > 0
+	case reflect.Ptr, reflect.Interface, reflect.Func:
+		return !field.IsNil()
+	default:
+		return field.IsValid() && field.Interface() != reflect.Zero(field.Type()).Interface()
+	}
 }

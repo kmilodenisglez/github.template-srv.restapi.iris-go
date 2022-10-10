@@ -43,29 +43,29 @@ type ConfigDB struct {
 // @Description drone model without the weightLimit, it is used for endpoint request
 // @Description the weight limit is calculated from the drone's model (Lightweight, Middleweight, Cruiserweight, Heavyweight)
 type RequestDrone struct {
-	SerialNumber    string     `json:"serialNumber" valid:"maxstringlength(100)"`
-	Model           DroneModel `json:"model" valid:"drone_enum_validation~unknown drone model"`
-	BatteryCapacity float64    `json:"batteryCapacity" valid:"range(0|100)"`
-	State           DroneState `json:"state" valid:"drone_enum_validation~unknown drone state"`
+	SerialNumber    string     `json:"serialNumber" validate:"required,max=100"`
+	Model           DroneModel `json:"model" validate:"drone_enum_validation"`
+	BatteryCapacity float64    `json:"batteryCapacity" validate:"gte=0,lte=100"`
+	State           DroneState `json:"state" validate:"drone_state_validation"`
 }
 
 // Drone model
 // @Description Drone item information
 type Drone struct {
-	SerialNumber    string     `json:"serialNumber" valid:"maxstringlength(100)"`
-	Model           DroneModel `json:"model" valid:"drone_enum_validation~unknown drone model"`
-	WeightLimit     float64    `json:"weightLimit" valid:"required~the weight limit is between 1 and 500 gr,range(1|500)~the weight limit is between 1 and 500 gr"`
-	BatteryCapacity float64    `json:"batteryCapacity" valid:"range(0|100)"`
-	State           DroneState `json:"state" valid:"drone_enum_validation~unknown drone state"`
+	SerialNumber    string     `json:"serialNumber" validate:"required,max=100"`
+	Model           DroneModel `json:"model" validate:"drone_enum_validation"`
+	WeightLimit     float64    `json:"weightLimit"`
+	BatteryCapacity float64    `json:"batteryCapacity" validate:"gte=0,lte=100"`
+	State           DroneState `json:"state" validate:"drone_state_validation"`
 }
 
 // Medication model
 // @Description Medication item information
 type Medication struct {
-	Name   string  `json:"name" valid:"medication_name_validation~invalid name (allowed only letters - numbers - ‘-‘ - ‘_’)"`
+	Name   string  `json:"name" validate:"medication_name_validation"`
 	Weight float64 `json:"weight"`
-	Code   string  `json:"code" valid:"medication_code_validation~invalid code (allowed only upper case letters - underscore and numbers)"` // we assume that the code is unique
-	Image  string  `json:"image" valid:"base64"`
+	Code   string  `json:"code" validate:"medication_code_validation"` // we assume that the code is unique
+	Image  string  `json:"image" validate:"base64"`
 }
 
 const (
