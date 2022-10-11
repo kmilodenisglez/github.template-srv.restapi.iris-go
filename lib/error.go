@@ -10,7 +10,7 @@ import (
 	"restapi.app/schema/dto"
 )
 
-const DefaultErrorLocale = "ens"
+const DefaultErrorLocale = "en"
 
 func InitTranslations(validate *validator.Validate) *ut.UniversalTranslator {
 	english := en.New()
