@@ -13,13 +13,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
+	"restapi.app/schema/dto"
 )
 
 // MkAccessToken create a signed JTW token with the specified data. This could be used for authentication purpose by a middleware
 func MkAccessToken(data *dto.AccessTokenData, sigKey []byte, tkAge uint8) ([]byte, error) { // https://github.com/kataras/iris/blob/master/_examples/auth/jwt/middleware/main.go | https://github.com/iris-contrib/examples/blob/master/auth/jwt/basic/main.go
 	tk, err := jwt.Sign(jwt.HS256, sigKey, data, jwt.MaxAge(time.Duration(tkAge)*time.Minute))
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	return tk, err
 }

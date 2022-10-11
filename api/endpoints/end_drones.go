@@ -2,17 +2,18 @@ package endpoints
 
 import (
 	"fmt"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/hero"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/lib"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/repo/db"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service/utils"
+	"restapi.app/lib"
+	"restapi.app/repo/db"
+	"restapi.app/schema"
+	"restapi.app/schema/dto"
+	"restapi.app/service"
+	"restapi.app/service/utils"
 )
 
 // FirstModuleHandler  endpoint handler struct for Drones
@@ -20,6 +21,7 @@ type FirstModuleHandler struct {
 	response *utils.SvcResponse
 	service  *service.ISvcDrones
 	validate *validator.Validate // handle validations for structs and individual fields based on tags
+	trans    ut.Translator
 }
 
 // NewFirstModuleHandler create and register the handler for Drones
@@ -31,11 +33,11 @@ type FirstModuleHandler struct {
 // - svcR [*utils.SvcResponse] ~ GrantIntentResponse service instance
 //
 // - svcC [utils.SvcConfig] ~ Configuration service instance
-func NewFirstModuleHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig, validate *validator.Validate) FirstModuleHandler { // --- VARS SETUP ---
+func NewFirstModuleHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig, validate *validator.Validate, trans ut.Translator) FirstModuleHandler { // --- VARS SETUP ---
 	repoDrones := db.NewRepoDrones(svcC)
 	svc := service.NewSvcDronesReqs(&repoDrones)
 	// registering protected / guarded router
-	h := FirstModuleHandler{svcR, &svc, validate}
+	h := FirstModuleHandler{svcR, &svc, validate, trans}
 
 	app.Get("/status", h.StatusServer)
 
@@ -197,7 +199,7 @@ func (h FirstModuleHandler) RegisterADrone(ctx iris.Context) {
 
 	// unmarshalling the JSON from request's body and validate fields
 	if err := ctx.ReadJSON(drone); err != nil {
-		dto.HandleError(ctx, err, iris.StatusBadRequest)
+		dto.HandleError(ctx, h.trans, err, iris.StatusBadRequest)
 	}
 
 	// calculate drone weight limit

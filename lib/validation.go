@@ -3,10 +3,11 @@ package lib
 import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
 	"reflect"
 	reg "regexp"
+	"restapi.app/schema/dto"
 	"strings"
 )
 
@@ -120,4 +121,35 @@ func NotBlank(fl validator.FieldLevel) bool {
 	default:
 		return field.IsValid() && field.Interface() != reflect.Zero(field.Type()).Interface()
 	}
+}
+
+func addTranslation(validate *validator.Validate, trans *ut.Translator, tag string, errMessage string) {
+	registerFn := func(ut ut.Translator) error {
+		return ut.Add(tag, errMessage, false)
+	}
+
+	transFn := func(ut ut.Translator, fe validator.FieldError) string {
+		param := fe.Param()
+		tag := fe.Tag()
+
+		t, err := ut.T(tag, fe.Field(), param)
+		if err != nil {
+			return fe.(error).Error()
+		}
+		return t
+	}
+
+	_ = validate.RegisterTranslation(tag, *trans, registerFn, transFn)
+}
+
+func translateError(err error, trans ut.Translator) (errs []error) {
+	if err == nil {
+		return nil
+	}
+	validatorErrs := err.(validator.ValidationErrors)
+	for _, e := range validatorErrs {
+		translatedErr := fmt.Errorf(e.Translate(trans))
+		errs = append(errs, translatedErr)
+	}
+	return errs
 }

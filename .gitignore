@@ -39,8 +39,8 @@
 .DS_Store
 
 vendor
-/github.template-srv.restapi.iris.go
-/github.template-srv.restapi.iris.go.exe
+/restapi_app
+/restapi_app.exe
 #/docs/docs.go
 #/docs/swagger.yaml
 #/docs/swagger.json

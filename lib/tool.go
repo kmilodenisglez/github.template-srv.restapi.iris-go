@@ -3,7 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
+	"restapi.app/schema"
 
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"

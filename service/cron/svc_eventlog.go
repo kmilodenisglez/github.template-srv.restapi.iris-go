@@ -2,9 +2,9 @@ package cron
 
 import (
 	"github.com/go-co-op/gocron"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/repo/db"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service/utils"
 	"log"
+	"restapi.app/repo/db"
+	"restapi.app/service/utils"
 	"time"
 )
 
@@ -14,8 +14,8 @@ type ISvcEventLog interface {
 }
 
 type svcEventLogReqs struct {
-	svcConf       *utils.SvcConfig
-	reposDrones   *db.RepoDrones
+	svcConf     *utils.SvcConfig
+	reposDrones *db.RepoDrones
 }
 
 // endregion =============================================================================

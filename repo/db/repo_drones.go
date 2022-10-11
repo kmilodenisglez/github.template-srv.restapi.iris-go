@@ -7,12 +7,12 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/lib"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service/utils"
 	"github.com/tidwall/buntdb"
 	"log"
+	"restapi.app/lib"
+	"restapi.app/schema"
+	"restapi.app/schema/dto"
+	"restapi.app/service/utils"
 	"strconv"
 	"strings"
 )
@@ -57,7 +57,6 @@ func (r *repoDrones) IsPopulated() bool {
 	return isPopulated(db)
 }
 
-
 // PopulateDB Populate the database with the initial information only if "IsPopulated" is
 // false or does not exist
 //nolint:gocognit
@@ -69,7 +68,9 @@ func (r *repoDrones) PopulateDB() error {
 	defer db.Close()
 
 	// If it is already populated, the execution of the function stops
-	if isPopulated(db) {return errors.New(schema.ErrBuntdbPopulated)}
+	if isPopulated(db) {
+		return errors.New(schema.ErrBuntdbPopulated)
+	}
 
 	var fakeUsersList = fakeUsers()
 	var fakeDronesList = fakeDrones()
@@ -251,12 +252,12 @@ func (r *repoDrones) GetDrone(serialNumber string) (*dto.Drone, error) {
 
 	db.CreateIndex("drone_state", "drone:*", buntdb.IndexJSON("batteryCapacity"))
 	err = db.View(func(tx *buntdb.Tx) error {
-		value, err := tx.Get("drone:"+serialNumber)
-		if err != nil{
+		value, err := tx.Get("drone:" + serialNumber)
+		if err != nil {
 			return err
 		}
 		err = jsoniter.UnmarshalFromString(value, &drone)
-		if err != nil{
+		if err != nil {
 			return err
 		}
 		return nil
@@ -334,7 +335,7 @@ func (r *repoDrones) RegisterDrone(drone *dto.Drone) error {
 		return err
 	}
 	log.Println("successfully added drone")
-	return  nil
+	return nil
 }
 
 // CheckingLoadedMedicationsItems checking loaded medication items for a given drone
@@ -350,12 +351,12 @@ func (r *repoDrones) CheckingLoadedMedicationsItems(serialNumber string) (*[]str
 
 	db.CreateIndex("loaded_medications", "loaded_medications:*", buntdb.IndexString)
 	err = db.View(func(tx *buntdb.Tx) error {
-		value, err := tx.Get("loaded_medications:"+serialNumber)
-		if err != nil{
+		value, err := tx.Get("loaded_medications:" + serialNumber)
+		if err != nil {
 			return err
 		}
 		err = jsoniter.UnmarshalFromString(value, &loadedMeds)
-		if err != nil{
+		if err != nil {
 			return err
 		}
 		return nil
@@ -426,7 +427,7 @@ func (r *repoDrones) LoadMedicationItemsADrone(drone *dto.Drone, medicationItemI
 	}
 	log.Println("successfully loaded medication items")
 
-	return  nil
+	return nil
 }
 
 func (r *repoDrones) ExistDrone(serialNumber string) error {
@@ -437,7 +438,7 @@ func (r *repoDrones) ExistDrone(serialNumber string) error {
 	defer db.Close()
 
 	err = db.View(func(tx *buntdb.Tx) error {
-		_, err := tx.Get("drone:"+serialNumber)
+		_, err := tx.Get("drone:" + serialNumber)
 		if err != nil {
 			return err
 		}
@@ -483,7 +484,6 @@ func (r *repoDrones) GetMedications() (*[]dto.Medication, error) {
 	return &medicationsList, nil
 }
 
-
 // endregion ======== Medications ======================================================
 
 // region ======== PRIVATE AUX ===========================================================
@@ -505,11 +505,11 @@ func isPopulated(db *buntdb.DB) bool {
 	db.CreateIndex("config", "config", buntdb.IndexString)
 	err := db.View(func(tx *buntdb.Tx) error {
 		value, err := tx.Get("config")
-		if err != nil{
+		if err != nil {
 			return err
 		}
 		err = jsoniter.UnmarshalFromString(value, &configDB)
-		if err != nil{
+		if err != nil {
 			log.Println("Unmarshal Error in IsPopulated func: ", err)
 			return err
 		}
@@ -541,61 +541,61 @@ func fakeUsers() []dto.User {
 func fakeDrones() []dto.Drone {
 	uuid := "123e4567-e89b-12d3-a456-4266141740"
 	var drones = []dto.Drone{{
-		SerialNumber:    uuid+"01",
+		SerialNumber:    uuid + "01",
 		Model:           dto.Cruiserweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Cruiserweight),
 		BatteryCapacity: 45,
 		State:           dto.IDLE,
 	}, {
-		SerialNumber:    uuid+"02",
+		SerialNumber:    uuid + "02",
 		Model:           dto.Middleweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Middleweight),
 		BatteryCapacity: 56.4,
 		State:           dto.DELIVERED,
 	}, {
-		SerialNumber:    uuid+"03",
+		SerialNumber:    uuid + "03",
 		Model:           dto.Heavyweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Heavyweight),
 		BatteryCapacity: 99.2,
 		State:           dto.LOADING,
 	}, {
-		SerialNumber:    uuid+"04",
+		SerialNumber:    uuid + "04",
 		Model:           dto.Middleweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Middleweight),
 		BatteryCapacity: 35.6,
 		State:           dto.RETURNING,
 	}, {
-		SerialNumber:    uuid+"05",
+		SerialNumber:    uuid + "05",
 		Model:           dto.Heavyweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Heavyweight),
 		BatteryCapacity: 52.9,
 		State:           dto.DELIVERING,
 	}, {
-		SerialNumber:    uuid+"06",
+		SerialNumber:    uuid + "06",
 		Model:           dto.Lightweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Lightweight),
 		BatteryCapacity: 12.9,
 		State:           dto.IDLE,
 	}, {
-		SerialNumber:    uuid+"07",
+		SerialNumber:    uuid + "07",
 		Model:           dto.Cruiserweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Cruiserweight),
 		BatteryCapacity: 91.3,
 		State:           dto.LOADED,
 	}, {
-		SerialNumber:    uuid+"08",
+		SerialNumber:    uuid + "08",
 		Model:           dto.Heavyweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Heavyweight),
 		BatteryCapacity: 73.6,
 		State:           dto.LOADED,
-	},{
-		SerialNumber:    uuid+"09",
+	}, {
+		SerialNumber:    uuid + "09",
 		Model:           dto.Lightweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Lightweight),
 		BatteryCapacity: 25,
 		State:           dto.IDLE,
-	},{
-		SerialNumber:    uuid+"10",
+	}, {
+		SerialNumber:    uuid + "10",
 		Model:           dto.Lightweight,
 		WeightLimit:     lib.CalculateDroneWeightLimit(dto.Lightweight),
 		BatteryCapacity: 25,

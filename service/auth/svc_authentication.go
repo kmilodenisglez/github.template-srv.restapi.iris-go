@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/repo/db"
+	"restapi.app/repo/db"
 )
 
 type SvcAuthentication struct {

@@ -107,7 +107,7 @@ Before it is recommended that you read more about the server configuration file 
 
 Run the server:
 ```bash
-./github.template-srv.restapi.iris.go
+./restapi.app
 ```
 
 and visit the swagger docs:

@@ -5,14 +5,14 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/hero"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/lib"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/repo/db"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/mapper"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service/auth"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/service/utils"
+	"restapi.app/lib"
+	"restapi.app/repo/db"
+	"restapi.app/schema"
+	"restapi.app/schema/dto"
+	"restapi.app/schema/mapper"
+	"restapi.app/service"
+	"restapi.app/service/auth"
+	"restapi.app/service/utils"
 )
 
 type HAuth struct {

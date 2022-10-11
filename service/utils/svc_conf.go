@@ -3,9 +3,9 @@ package utils
 import (
 	"fmt"
 
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/lib"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
 	"github.com/tkanos/gonfig"
+	"restapi.app/lib"
+	"restapi.app/schema"
 )
 
 // region ======== TYPES =================================================================

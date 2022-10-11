@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/base64"
 
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/repo/db"
+	"restapi.app/repo/db"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/lib"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
+	"restapi.app/lib"
+	"restapi.app/schema"
+	"restapi.app/schema/dto"
 
 	"os"
 	"testing"
@@ -55,7 +55,6 @@ func TestNewApp(t *testing.T) {
 	}
 
 	_ = e.POST("/api/v1/auth").WithJSON(cred).Expect().Status(httptest.StatusUnauthorized)
-
 
 	// drone valid
 	droneValid := dto.Drone{

@@ -2,10 +2,10 @@ package auth
 
 import (
 	"github.com/kataras/iris/v12"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/lib"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/repo/db"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
+	"restapi.app/lib"
+	"restapi.app/repo/db"
+	"restapi.app/schema"
+	"restapi.app/schema/dto"
 )
 
 type Provider interface {

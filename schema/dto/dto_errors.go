@@ -2,6 +2,7 @@ package dto
 
 import (
 	"fmt"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/kataras/iris/v12"
 )
@@ -20,6 +21,7 @@ type validationError struct {
 	Type      string `json:"type"`
 	Value     string `json:"value"`
 	Param     string `json:"param"`
+	Message   string `json:"message"`
 }
 
 // NewProblem construct a new api error struct and return a pointer to it
@@ -34,10 +36,10 @@ func NewProblem(s uint, t string, d string) *Problem {
 }
 
 // HandleError the error, below you will find the right way to do that...
-func HandleError(ctx iris.Context, err error, code int) {
+func HandleError(ctx iris.Context, trans ut.Translator, err error, code int) {
 	if errs, ok := err.(validator.ValidationErrors); ok {
 		// Wrap the errors with JSON format, the underline library returns the errors as interface.
-		validationErrors := wrapValidationErrors(errs)
+		validationErrors := wrapValidationTranslateErrors(errs, trans)
 
 		// Fire an application/json+problem response and stop the handlers chain.
 		ctx.StopWithProblem(code, iris.NewProblem().
@@ -53,9 +55,9 @@ func HandleError(ctx iris.Context, err error, code int) {
 	return
 }
 
-func wrapValidationErrors(errs validator.ValidationErrors) []validationError {
-	validationErrors := make([]validationError, 0, len(errs))
-	for _, validationErr := range errs {
+func wrapValidationErrors(validatorErrs validator.ValidationErrors) []validationError {
+	validationErrors := make([]validationError, 0, len(validatorErrs))
+	for _, validationErr := range validatorErrs {
 		validationErrors = append(validationErrors, validationError{
 			ActualTag: validationErr.ActualTag(),
 			Namespace: validationErr.Namespace(),
@@ -63,8 +65,25 @@ func wrapValidationErrors(errs validator.ValidationErrors) []validationError {
 			Type:      validationErr.Type().String(),
 			Value:     fmt.Sprintf("%v", validationErr.Value()),
 			Param:     validationErr.Param(),
+			Message:   validationErr.Error(),
 		})
 	}
 
+	return validationErrors
+}
+
+func wrapValidationTranslateErrors(validatorErrs validator.ValidationErrors, trans ut.Translator) []validationError {
+	validationErrors := make([]validationError, 0, len(validatorErrs))
+	for _, validationErr := range validatorErrs {
+		validationErrors = append(validationErrors, validationError{
+			ActualTag: validationErr.ActualTag(),
+			Namespace: validationErr.Namespace(),
+			Kind:      validationErr.Kind().String(),
+			Type:      validationErr.Type().String(),
+			Value:     fmt.Sprintf("%v", validationErr.Value()),
+			Param:     validationErr.Param(),
+			Message:   validationErr.Translate(trans),
+		})
+	}
 	return validationErrors
 }

@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/middleware/jwt"
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
+	"restapi.app/schema/dto"
 )
 
 // NewAuthCheckerMiddleware Bearer Authentication token verification middleware

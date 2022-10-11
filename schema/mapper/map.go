@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"github.com/kmilodenisglez/github.template-srv.restapi.iris.go/schema/dto"
+	"restapi.app/schema/dto"
 	"strings"
 )
 
@@ -13,9 +13,9 @@ import (
 // TODO: ground the rol idea, according to the Drone app logic
 func ToAccessTokenDataV(obj *dto.GrantIntentResponse) *dto.AccessTokenData {
 	// claims := dto.Claims{ Sub: obj.Identifier, Rol: "undefined" }
-	claims := dto.InjectedParam{ Did: obj.DID, Username: obj.Identifier }
+	claims := dto.InjectedParam{Did: obj.DID, Username: obj.Identifier}
 
-	return &dto.AccessTokenData{ Scope: strings.Fields("api.drones"), Claims: claims }
+	return &dto.AccessTokenData{Scope: strings.Fields("api.drones"), Claims: claims}
 }
 
 // endregion =============================================================================
