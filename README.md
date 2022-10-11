@@ -55,9 +55,9 @@ By default, **StoreDBPath** generates the database file in the /db folder at the
 The server exposes the `/api/v1/database/populate` POST endpoint to generate and repopulate the database whenever necessary.
 ## ⚡ Get Started <a name="get_started"></a>
 
-Download the github.template-srv.restapi.iris.go project and move to root of project:
+Download the github.template-srv.restapi.iris-go project and move to root of project:
 ```bash
-git clone https://github.com/kmilodenisglez/github.template-srv.restapi.iris.go.git && cd github.template-srv.restapi.iris.go 
+git clone https://github.com/kmilodenisglez/github.template-srv.restapi.iris-go.git && cd github.template-srv.restapi.iris-go
 ```
 
 ### 🚀 Deployment ways (2 ways)  <a name="deploy_ways"></a>
