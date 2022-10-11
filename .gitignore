@@ -41,8 +41,8 @@
 vendor
 /restapi_app
 /restapi_app.exe
-#/docs/docs.go
-#/docs/swagger.yaml
-#/docs/swagger.json
+/docs/docs.go
+/docs/swagger.yaml
+/docs/swagger.json
 
 /db/*.db
