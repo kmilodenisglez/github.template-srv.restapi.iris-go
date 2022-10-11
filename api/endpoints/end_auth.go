@@ -155,7 +155,7 @@ func (h HAuth) logout(ctx iris.Context) {
 func (h HAuth) userGet(ctx iris.Context, params dto.InjectedParam, r db.RepoDrones) {
 	user, err := r.GetUser(params.Did, true)
 	if err != nil {
-		h.response.ResErr(dto.NewProblem(iris.StatusInternalServerError, schema.ErrBuntdb, err.Error()), &ctx)
+		h.response.ResErr(lib.NewProblem(iris.StatusInternalServerError, schema.ErrBuntdb, err.Error()), &ctx)
 		return
 	}
 	h.response.ResOKWithData(user, &ctx)

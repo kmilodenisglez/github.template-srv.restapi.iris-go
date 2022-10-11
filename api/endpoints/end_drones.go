@@ -21,7 +21,7 @@ type FirstModuleHandler struct {
 	response *utils.SvcResponse
 	service  *service.ISvcDrones
 	validate *validator.Validate // handle validations for structs and individual fields based on tags
-	trans    ut.Translator
+	uTrans   *ut.UniversalTranslator
 }
 
 // NewFirstModuleHandler create and register the handler for Drones
@@ -33,11 +33,11 @@ type FirstModuleHandler struct {
 // - svcR [*utils.SvcResponse] ~ GrantIntentResponse service instance
 //
 // - svcC [utils.SvcConfig] ~ Configuration service instance
-func NewFirstModuleHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig, validate *validator.Validate, trans ut.Translator) FirstModuleHandler { // --- VARS SETUP ---
+func NewFirstModuleHandler(app *iris.Application, mdwAuthChecker *context.Handler, svcR *utils.SvcResponse, svcC *utils.SvcConfig, validate *validator.Validate, uT *ut.UniversalTranslator) FirstModuleHandler { // --- VARS SETUP ---
 	repoDrones := db.NewRepoDrones(svcC)
 	svc := service.NewSvcDronesReqs(&repoDrones)
 	// registering protected / guarded router
-	h := FirstModuleHandler{svcR, &svc, validate, trans}
+	h := FirstModuleHandler{svcR, &svc, validate, uT}
 
 	app.Get("/status", h.StatusServer)
 
@@ -133,7 +133,7 @@ func (h FirstModuleHandler) PopulateDB(ctx iris.Context) {
 func (h FirstModuleHandler) GetDrones(ctx iris.Context) {
 	qState, err := ctx.URLParamInt("state")
 	if err != nil && err != iris.ErrNotFound {
-		h.response.ResErr(dto.NewProblem(iris.StatusInternalServerError, schema.ErrParamURL, err.Error()), &ctx)
+		h.response.ResErr(lib.NewProblem(iris.StatusInternalServerError, schema.ErrParamURL, err.Error()), &ctx)
 		return
 	}
 
@@ -199,7 +199,7 @@ func (h FirstModuleHandler) RegisterADrone(ctx iris.Context) {
 
 	// unmarshalling the JSON from request's body and validate fields
 	if err := ctx.ReadJSON(drone); err != nil {
-		dto.HandleError(ctx, h.trans, err, iris.StatusBadRequest)
+		lib.HandleError(ctx, h.uTrans, err, iris.StatusBadRequest)
 	}
 
 	// calculate drone weight limit

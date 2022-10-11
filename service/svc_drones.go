@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"restapi.app/lib"
 
 	"github.com/kataras/iris/v12"
 	"github.com/tidwall/buntdb"
@@ -58,12 +59,12 @@ func (s *svcDronesReqs) PopulateDBSvc() *dto.Problem {
 
 	switch {
 	case err == buntdb.ErrNotFound:
-		return dto.NewProblem(iris.StatusPreconditionFailed, schema.ErrBuntdbItemNotFound, err.Error())
+		return lib.NewProblem(iris.StatusPreconditionFailed, schema.ErrBuntdbItemNotFound, err.Error())
 	case err != nil:
 		if err.Error() == schema.ErrBuntdbPopulated {
-			return dto.NewProblem(iris.StatusInternalServerError, schema.ErrBuntdbPopulated, "the database has already been populated")
+			return lib.NewProblem(iris.StatusInternalServerError, schema.ErrBuntdbPopulated, "the database has already been populated")
 		}
-		return dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return nil
 }
@@ -71,7 +72,7 @@ func (s *svcDronesReqs) PopulateDBSvc() *dto.Problem {
 func (s *svcDronesReqs) GetUserSvc(id string, filter bool) (*dto.User, *dto.Problem) {
 	res, err := (*s.reposDrones).GetUser(id, filter)
 	if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return res, nil
 }
@@ -79,7 +80,7 @@ func (s *svcDronesReqs) GetUserSvc(id string, filter bool) (*dto.User, *dto.Prob
 func (s *svcDronesReqs) GetUsersSvc() (*[]dto.User, *dto.Problem) {
 	res, err := (*s.reposDrones).GetUsers()
 	if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return res, nil
 }
@@ -89,9 +90,9 @@ func (s *svcDronesReqs) GetADroneSvc(serialNumber string) (*dto.Drone, *dto.Prob
 	res, err := (*s.reposDrones).GetDrone(serialNumber)
 	// Getting non-existent values will cause an ErrNotFound error.
 	if err == buntdb.ErrNotFound {
-		return nil, dto.NewProblem(iris.StatusPreconditionFailed, schema.ErrBuntdbItemNotFound, err.Error())
+		return nil, lib.NewProblem(iris.StatusPreconditionFailed, schema.ErrBuntdbItemNotFound, err.Error())
 	} else if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 
 	return res, nil
@@ -105,7 +106,7 @@ func (s *svcDronesReqs) GetDronesSvc(filters ...string) (*[]dto.Drone, *dto.Prob
 
 	res, err := (*s.reposDrones).GetDrones(filter)
 	if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 
 	return res, nil
@@ -114,7 +115,7 @@ func (s *svcDronesReqs) GetDronesSvc(filters ...string) (*[]dto.Drone, *dto.Prob
 func (s *svcDronesReqs) RegisterDroneSvc(drone *dto.Drone) *dto.Problem {
 	err := (*s.reposDrones).RegisterDrone(drone)
 	if err != nil {
-		return dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return nil
 }
@@ -125,7 +126,7 @@ func (s *svcDronesReqs) ExistDroneSvc(serialNumber string) (bool, *dto.Problem) 
 	if err == buntdb.ErrNotFound {
 		return false, nil
 	} else if err != nil {
-		return false, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return false, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return true, nil
 }
@@ -133,7 +134,7 @@ func (s *svcDronesReqs) ExistDroneSvc(serialNumber string) (bool, *dto.Problem) 
 func (s *svcDronesReqs) GetMedicationsSvc() (*[]dto.Medication, *dto.Problem) {
 	res, err := (*s.reposDrones).GetMedications()
 	if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return res, nil
 }
@@ -143,9 +144,9 @@ func (s *svcDronesReqs) CheckingLoadedMedicationsItemsSvc(serialNumberDrone stri
 	err := (*s.reposDrones).ExistDrone(serialNumberDrone)
 	// Getting non-existent values will cause an ErrNotFound error.
 	if err == buntdb.ErrNotFound {
-		return nil, dto.NewProblem(iris.StatusPreconditionFailed, schema.ErrBuntdbItemNotFound, fmt.Sprintf("the drone with serial number %s does not exist", serialNumberDrone))
+		return nil, lib.NewProblem(iris.StatusPreconditionFailed, schema.ErrBuntdbItemNotFound, fmt.Sprintf("the drone with serial number %s does not exist", serialNumberDrone))
 	} else if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 
 	// if the drone exists, then we check if it has medication items associated with it
@@ -156,7 +157,7 @@ func (s *svcDronesReqs) CheckingLoadedMedicationsItemsSvc(serialNumberDrone stri
 	if err == buntdb.ErrNotFound {
 		return &[]string{}, nil
 	} else if err != nil {
-		return nil, dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return nil, lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return res, nil
 }
@@ -170,16 +171,16 @@ func (s *svcDronesReqs) LoadMedicationItemsADroneSvc(serialNumberDrone string, m
 
 	// prevent the drone from being in LOADING state if the battery level is **below 25%**
 	if drone.BatteryCapacity < 25.0 {
-		return dto.NewProblem(iris.StatusPreconditionFailed, schema.ErrDroneVeryLowBatteryKey, schema.ErrDroneVeryLowBattery.Error())
+		return lib.NewProblem(iris.StatusPreconditionFailed, schema.ErrDroneVeryLowBatteryKey, schema.ErrDroneVeryLowBattery.Error())
 	} else if drone.State != dto.IDLE {
-		return dto.NewProblem(iris.StatusPreconditionFailed, schema.ErrDroneBusyKey, schema.ErrDroneBusy.Error())
+		return lib.NewProblem(iris.StatusPreconditionFailed, schema.ErrDroneBusyKey, schema.ErrDroneBusy.Error())
 	}
 
 	err := (*s.reposDrones).LoadMedicationItemsADrone(drone, medicationItemIDs)
 	if err == buntdb.ErrNotFound {
-		return dto.NewProblem(iris.StatusPreconditionFailed, schema.ErrDroneMaximumLoadWeightExceededKey, err.Error())
+		return lib.NewProblem(iris.StatusPreconditionFailed, schema.ErrDroneMaximumLoadWeightExceededKey, err.Error())
 	} else if err != nil {
-		return dto.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
+		return lib.NewProblem(iris.StatusExpectationFailed, schema.ErrBuntdb, err.Error())
 	}
 	return nil
 }

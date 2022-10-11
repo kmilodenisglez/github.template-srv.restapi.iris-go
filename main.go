@@ -2,10 +2,6 @@ package main
 
 import (
 	"fmt"
-	ut "github.com/go-playground/universal-translator"
-	enTranslations "github.com/go-playground/validator/v10/translations/en"
-
-	"github.com/go-playground/locales/en"
 	"github.com/go-playground/validator/v10"
 	"github.com/iris-contrib/swagger/v12"              // swagger middleware for Iris
 	"github.com/iris-contrib/swagger/v12/swaggerFiles" // swagger embed files
@@ -20,20 +16,12 @@ import (
 	"restapi.app/service/utils"
 )
 
-func translations(validate *validator.Validate) ut.Translator {
-	english := en.New()
-	uni := ut.New(english, english)
-	trans, _ := uni.GetTranslator("en")
-	_ = enTranslations.RegisterDefaultTranslations(validate, trans)
-	return trans
-}
-
 func newApp() (*iris.Application, *utils.SvcConfig) {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	// region ======== GLOBALS ===============================================================
 	validate := validator.New() // Validator instance. Reference https://github.com/kataras/iris/wiki/Model-validation | https://github.com/go-playground/validator
-	trans := translations(validate)
+	universalTranslator := lib.InitTranslations(validate)
 
 	app := iris.New()        // App instance
 	app.Validator = validate // Register validation on the iris app
@@ -84,7 +72,7 @@ func newApp() (*iris.Application, *utils.SvcConfig) {
 	// region ======== ENDPOINT REGISTRATIONS ================================================
 
 	endpoints.NewAuthHandler(app, &mdwAuthChecker, svcResponse, svcConfig, validate)
-	endpoints.NewFirstModuleHandler(app, &mdwAuthChecker, svcResponse, svcConfig, validate, trans) // Drones request handlers
+	endpoints.NewFirstModuleHandler(app, &mdwAuthChecker, svcResponse, svcConfig, validate, universalTranslator) // Drones request handlers
 	// endregion =============================================================================
 
 	// region ======== SWAGGER REGISTRATION ==================================================
